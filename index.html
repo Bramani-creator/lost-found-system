@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lost & Found Room System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .top-header {
+      width: 100%;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+      padding: 15px 0;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .container {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+      animation: fadeIn 0.6s ease;
+    }
+
+    h1, h2 { margin-bottom: 10px; }
+    p { color: #666; margin-bottom: 20px; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .primary { background: #007bff; color: white; }
+    .secondary { background: #e9ecef; }
+
+    .btn:hover { transform: scale(1.05); }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .hidden { display: none; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-header">Lost & Found Room System</div>
+
+  <div class="container">
+
+  <!-- Entry Screen -->
+  <div class="card" id="entryScreen">
+    <h2>Welcome</h2>
+    <p>Are you a New User or Existing User?</p>
+    <button class="btn primary" onclick="showScreen('createRoom')">Create New Room</button>
+    <button class="btn secondary" onclick="showScreen('joinRoom')">Join Existing Room</button>
+  </div>
+
+  <!-- Create Room -->
+  <div class="card hidden" id="createRoom">
+    <h2>Create New Room</h2>
+    <input type="text" id="roomName" placeholder="Room Name" />
+    <input type="text" id="creatorName" placeholder="Creator Name" />
+    <input type="text" id="creatorPhone" placeholder="Contact Number (optional)" />
+    <button class="btn primary" onclick="createRoom()">Create Room</button>
+    <button class="btn secondary" onclick="showScreen('entryScreen')">Back</button>
+  </div>
+
+  <!-- Join Room -->
+  <div class="card hidden" id="joinRoom">
+    <h2>Join Room</h2>
+    <input type="text" id="roomInput" placeholder="Enter Room ID" />
+    <button class="btn primary" onclick="joinRoom()">Enter Room</button>
+    <button class="btn secondary" onclick="showScreen('entryScreen')">Back</button>
+  </div>
+
+  <!-- Room Created -->
+  <div class="card hidden" id="roomCreated">
+    <h2>Room Created 🎉</h2>
+    <p><b>Your Room ID:</b></p>
+    <p id="roomIdText"></p>
+    <button class="btn primary" onclick="goToDashboard()">Go to Dashboard</button>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="card hidden" id="dashboard">
+    <h2>Room Dashboard</h2>
+    <p id="welcomeText"></p>
+    <button class="btn primary" onclick="showScreen('lostGallery')">I Lost My Object</button>
+    <button class="btn secondary" onclick="showScreen('foundForm')">I Got an Object</button>
+    <button class="btn secondary" onclick="logout()">Exit Room</button>
+  </div>
+
+  <!-- Found Form -->
+  <div class="card hidden" id="foundForm">
+    <h2>Report Found Object</h2>
+    <input type="file" />
+    <input type="text" placeholder="Object Name" />
+    <textarea placeholder="Description"></textarea>
+    <input type="text" placeholder="Location Found" />
+    <input type="date" />
+    <input type="text" placeholder="Finder Name" />
+    <input type="text" placeholder="Contact Info" />
+    <button class="btn primary" onclick="submitFound()">Submit</button>
+    <button class="btn secondary" onclick="showScreen('dashboard')">Back to Dashboard</button>
+  </div>
+
+  <!-- Lost Gallery -->
+  <div class="card hidden" id="lostGallery">
+    <h2>Found Objects</h2>
+    <p>No matching item? Report below.</p>
+    <button class="btn primary" onclick="showScreen('lostForm')">Report Lost Object</button>
+    <button class="btn secondary" onclick="showScreen('dashboard')">Back to Dashboard</button>
+  </div>
+
+  <!-- Lost Form -->
+  <div class="card hidden" id="lostForm">
+    <h2>Report Lost Object</h2>
+    <input type="file" />
+    <input type="text" placeholder="Object Name" />
+    <textarea placeholder="Description"></textarea>
+    <input type="text" placeholder="Location Lost" />
+    <input type="date" />
+    <input type="text" placeholder="Contact Info" />
+    <button class="btn primary" onclick="submitLost()">Submit</button>
+    <button class="btn secondary" onclick="showScreen('dashboard')">Go to Dashboard</button>
+  </div>
+
+  </div>
+
+  <script>
+    function showScreen(id) {
+      document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function createRoom() {
+      const roomName = document.getElementById('roomName').value;
+      const creator = document.getElementById('creatorName').value;
+
+      if (!roomName || !creator) {
+        alert('Please fill required fields');
+        return;
+      }
+
+      const roomId = 'ROOM-' + Math.floor(Math.random() * 9000 + 1000);
+
+      // Save user session in browser
+      localStorage.setItem('roomId', roomId);
+      localStorage.setItem('creatorName', creator);
+
+      document.getElementById('roomIdText').innerText = roomId;
+      showScreen('roomCreated');
+    }
+
+    function joinRoom() {
+      const input = document.getElementById('roomInput').value;
+
+      if (input.trim() === '') {
+        alert('Enter Room ID');
+        return;
+      }
+
+      // Save joined room
+      localStorage.setItem('roomId', input);
+      localStorage.setItem('creatorName', 'User');
+
+      goToDashboard();
+    }
+
+    function goToDashboard() {
+      const name = localStorage.getItem('creatorName');
+      document.getElementById('welcomeText').innerText = 'Welcome, ' + name;
+      showScreen('dashboard');
+    }
+
+    function logout() {
+      localStorage.clear();
+      showScreen('entryScreen');
+    }
+
+    function submitFound() {
+      alert('Found object saved successfully!');
+      showScreen('dashboard');
+    }
+
+    function submitLost() {
+      alert('Lost object reported successfully!');
+      showScreen('dashboard');
+    }
+
+    // Auto login if room already created before
+    window.onload = function () {
+      const roomId = localStorage.getItem('roomId');
+      if (roomId) {
+        goToDashboard();
+      }
+    };
+  </script>
+
+</body>
+</html>
