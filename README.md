@@ -18,8 +18,7 @@ A simple web-based Lost and Found System that helps users report and find lost o
 
 ## Live Demo
 
-gh repo clone Bramani-creator/lost-found-system
-
+https://bramani-creator.github.io/lost-found-system/
 ## Author
 
 **Bramani Pucchakayala**
